@@ -1,3 +1,4 @@
+import { fetchCountries } from './fetchCountries';
 import './sass/main.scss';
 import { debounce } from 'lodash';
 import { error, defaultModules } from '@pnotify/core';
@@ -10,13 +11,7 @@ inputCountry.addEventListener('keydown', debouncedInput);
 function onInputCountry() {
   listCountries.innerHTML = '';
   if (inputCountry.value !== '') {
-    fetch(`https://restcountries.eu/rest/v2/name/${inputCountry.value}`)
-      .then(response => {
-        if (response.status === 404) {
-          return [];
-        }
-        return response.json();
-      })
+    fetchCountries(inputCountry.value)
       .then(countries => {
         if (countries.length === 0) {
           incorrectlyEnteredCountry(countries);
@@ -30,7 +25,10 @@ function onInputCountry() {
           displayCountries(countries);
           return;
         }
-        error(`We found ${countries.length} countries. Please enter a more specific query!`);
+        error({
+          text: `We found ${countries.length} countries. Please enter a more specific query!`,
+          delay: 3000,
+        });
       })
       .catch(error => {
         console.log(error);
